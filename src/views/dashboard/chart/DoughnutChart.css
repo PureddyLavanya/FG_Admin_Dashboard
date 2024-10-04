@@ -1,0 +1,9 @@
+.custom-modal .modal-dialog {
+    max-width: 80vw;  /* Adjust the width */
+    max-height: 90vh; /* Adjust the height */
+  }
+  
+  .custom-modal .modal-content {
+    height: 100%;
+  }
+  
