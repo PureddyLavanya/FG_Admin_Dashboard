@@ -8,7 +8,6 @@ import axios from 'axios';
 
 const JWTLogin = () => {
   const navigate = useNavigate();
-  const details = [{ Username: "Adithya441", email: "adithyachalumuri733@gmail.com", password: "123456" },{ Username: "Adithya", email: "adithyachalumuri@gmail.com", password: "12345678" },{ Username: "Adithya7890", email: "adithyachalumuri7@gmail.com", password: "123456987" }];
   const [data,setData] = useState([{}]);
 
   useEffect(() => {

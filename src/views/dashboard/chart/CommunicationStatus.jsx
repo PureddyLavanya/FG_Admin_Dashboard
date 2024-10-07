@@ -1,12 +1,13 @@
 import React, { useState, useEffect,useRef } from "react";
 import { AgCharts } from "ag-charts-react";
 import { Form, Col, Dropdown, DropdownButton,Table,Modal,Row,Button } from 'react-bootstrap';
-import { FaBars } from 'react-icons/fa';
+import { FaTable,FaChartBar } from 'react-icons/fa';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import './styles.css';
 import ExcelJS from 'exceljs';
+import UserData from './UserData';
 
 const CommunicationStatus = () => {
   const chartRef=useRef(null);
@@ -23,6 +24,9 @@ const CommunicationStatus = () => {
   const [options, setOptions] = useState(null);  
   const [showModal,setShowModal]=useState(false);
   const [clickedData,setclickedData]=useState({});
+  const [showChart,setshowChart]=useState(true);
+  const [showTable,setshowTable]=useState(false);
+  const [tableData,settableData]=useState();
 
   const handleChangeSelectedMonth = (e) => {
     setSelectedMonth(e.target.value);
@@ -67,6 +71,7 @@ const CommunicationStatus = () => {
           }
       ]
     });
+    settableData(newData);
   }, [selectedMonth]);
 
   
@@ -106,12 +111,12 @@ const CommunicationStatus = () => {
     const dExcel = async () => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Ice Cream Sales Data');
-
+    
       worksheet.addRow([`Ice Cream Sales Data for Month: ${mdata.month}`]);
-
+    
       const header = ['Month', 'Sales'];
       const headerRow = worksheet.addRow(header);
-
+    
       headerRow.eachCell((cell) => {
         cell.font = { bold: true };
         cell.fill = {
@@ -120,9 +125,9 @@ const CommunicationStatus = () => {
           fgColor: { argb: 'FFFF00' },
         };
       });
-
+    
       worksheet.addRow([mdata.month, mdata.iceCreamSales]);
-
+    
       worksheet.columns.forEach((column) => {
         let maxLength = 0;
         column.eachCell({ includeEmpty: true }, (cell) => {
@@ -133,11 +138,17 @@ const CommunicationStatus = () => {
         });
         column.width = maxLength + 2;
       });
-
+    
+      worksheet.autoFilter = {
+        from: 'A2', 
+        to: 'B2',   
+      };
+    
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       saveAs(blob, `${mdata.month}_sales.xlsx`);
     };
+    
 
     return (
       <Modal show={showModal} onHide={onClose} size="xl" centered className='mdl'>
@@ -175,9 +186,13 @@ const CommunicationStatus = () => {
             </tbody>
           </Table>
         </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={onClose}>Close</Button>
+        </Modal.Footer>
       </Modal>
     );
   };
+
   const downloadCSV = () => {
     const csvContent = `Ice Cream Sales Chart Data\nMonth,Sales\n`
       + chartData.map(e => `${e.month},${e.iceCreamSales}`).join("\n");
@@ -232,9 +247,9 @@ const CommunicationStatus = () => {
 
   return (
     <div className="mx-auto">
-    <div className="form-container  mx-auto">
+    <div className="form-container  mx-auto p-3">
       <Form as={Row} md='12' className="align-items-center mb-3">
-        <Form.Group as={Col} md={6} className="d-flex  mr-2">
+        <Form.Group as={Col} md={6} className="d-flex">
         <Form.Label className="d-flex" >Select Month</Form.Label>
         <Form.Control as="select" value={selectedMonth} onChange={handleChangeSelectedMonth}>
           <option value="All">All</option>
@@ -247,19 +262,31 @@ const CommunicationStatus = () => {
           <option value="December">December</option>
         </Form.Control>
         </Form.Group>
-        <Col md={2} className="d-flex justify-content-end ">
-        <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All'}>
+        <Col md={2} className="d-flex justify-content-center ">
+        <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All' && !showTab}>
               <Dropdown.Item onClick={downloadCSV}>CSV</Dropdown.Item>
               <Dropdown.Item onClick={downloadPDF}>PDF</Dropdown.Item>
               <Dropdown.Item onClick={downloadPNG}>PNG</Dropdown.Item>
         </DropdownButton>
         </Col>
+        {/* <Col md={2} className="d-flex justify-content-center">
+          <FaChartBar onClick={()=>setshowTable(false)}/>
+        </Col> */}
+        <Col md={2} className="d-flex justify-content-end">
+          <FaTable  onClick={()=>setshowTable(!showTable)} />
+        </Col>
       </Form>
     </div>
-    <div ref={chartRef} className="ag-charts-wrapper">
+    { showTable ?(
+      <div>
+              <UserData tdata={tableData} />
+      </div>
+     ):
+     <div ref={chartRef} className="ag-charts-wrapper">
          {options && <AgCharts options={options} />}
     </div>
-    
+    } 
+
     {showModal && (
       <DataModal onClose={() => setShowModal(false)} mdata={clickedData} canvasref={chartRef} />
     )}
