@@ -12,8 +12,8 @@ const UserData=({tdata})=>{
       filter:true,
       // floatingFilter:true,
       filterParams:{
-        debounceMs:2000
-  
+        debounceMs:1000,
+        buttons: ['apply','reset']
       },
       editable:true
     };
