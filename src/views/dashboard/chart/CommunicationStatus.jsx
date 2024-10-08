@@ -263,7 +263,7 @@ const CommunicationStatus = () => {
         </Form.Control>
         </Form.Group>
         <Col md={2} className="d-flex justify-content-center ">
-        <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All' && !showTab}>
+        <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All'}>
               <Dropdown.Item onClick={downloadCSV}>CSV</Dropdown.Item>
               <Dropdown.Item onClick={downloadPDF}>PDF</Dropdown.Item>
               <Dropdown.Item onClick={downloadPNG}>PNG</Dropdown.Item>
@@ -278,13 +278,13 @@ const CommunicationStatus = () => {
       </Form>
     </div>
     { showTable ?(
-      <div>
-              <UserData tdata={tableData} />
-      </div>
-     ):
-     <div ref={chartRef} className="ag-charts-wrapper">
-         {options && <AgCharts options={options} />}
-    </div>
+        <div>
+          <UserData tdata={tableData} />
+        </div>
+        ):
+        <div ref={chartRef} className="ag-charts-wrapper">
+          {options && <AgCharts options={options} />}
+        </div>
     } 
 
     {showModal && (

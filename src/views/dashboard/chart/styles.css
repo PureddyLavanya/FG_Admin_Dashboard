@@ -8,3 +8,14 @@ z-index: 100;}
 .dbtn{
   top:0px;
 }
+/*custom styling for ag grid theme */
+.ag-theme-quartz-dark {
+  /* Changes the color of the grid text */
+    --ag-foreground-color: rgb(233, 237, 244);
+    /* Changes the color of the grid background */
+    --ag-background-color: rgb(241, 247, 255);
+    /* Changes the header color of the top row */
+    --ag-header-background-color: rgb(228, 237, 250);
+    /* Changes the hover color of the row*/
+    --ag-row-hover-color: rgb(216, 226, 255);
+}
