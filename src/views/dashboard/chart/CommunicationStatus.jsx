@@ -148,8 +148,6 @@ const CommunicationStatus = () => {
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       saveAs(blob, `${mdata.month}_sales.xlsx`);
     };
-    
-
     return (
       <Modal show={showModal} onHide={onClose} size="xl" centered className='mdl'>
         <Modal.Header closeButton>
@@ -263,15 +261,16 @@ const CommunicationStatus = () => {
         </Form.Control>
         </Form.Group>
         <Col md={2} className="d-flex justify-content-center ">
-        <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All'}>
+        
+          { !showTable&&(
+            <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All'}>
               <Dropdown.Item onClick={downloadCSV}>CSV</Dropdown.Item>
               <Dropdown.Item onClick={downloadPDF}>PDF</Dropdown.Item>
               <Dropdown.Item onClick={downloadPNG}>PNG</Dropdown.Item>
-        </DropdownButton>
+            </DropdownButton>
+            )
+          }        
         </Col>
-        {/* <Col md={2} className="d-flex justify-content-center">
-          <FaChartBar onClick={()=>setshowTable(false)}/>
-        </Col> */}
         <Col md={2} className="d-flex justify-content-end">
           <FaTable  onClick={()=>setshowTable(!showTable)} />
         </Col>
@@ -282,7 +281,7 @@ const CommunicationStatus = () => {
           <UserData tdata={tableData} />
         </div>
         ):
-        <div ref={chartRef} className="ag-charts-wrapper">
+        <div ref={chartRef} className="ag-charts-wrapper" lg='9' md='10' sm='10' >
           {options && <AgCharts options={options} />}
         </div>
     } 
