@@ -358,7 +358,7 @@ const CommunicationStatus = () => {
           <option value="Electronic">Electronic</option>
         </Form.Control>
         </Form.Group>
-        <Col md={2} className="d-flex justify-content-center ">
+        <Col md={4} className="d-flex justify-content-center ">
         
           { !showTable&&(
             <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedPrdCategory !== 'All'}>
@@ -381,7 +381,7 @@ const CommunicationStatus = () => {
     }
 
         { chartData  && !showTable && options && (
-          <div ref={chartRef} className="ag-charts-wrapper col-xl-8">
+          <div ref={chartRef} className="ag-charts-wrapper col-10 col-sm-8">
             <AgCharts options={options} />
           </div>
         )}

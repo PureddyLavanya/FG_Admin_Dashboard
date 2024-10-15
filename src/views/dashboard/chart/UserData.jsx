@@ -79,10 +79,18 @@ const UserData=({tdata})=>{
       column.width = maxLength + 2; 
     });
   
+    if(tdata.length==20){
     worksheet.autoFilter = {
       from: 'A1',
-      to: 'C20',
+      to: 'D20',
     };
+    }
+    else{
+      worksheet.autoFilter = {
+        from: 'A1',
+        to: 'C6',
+      };
+    }
   
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
