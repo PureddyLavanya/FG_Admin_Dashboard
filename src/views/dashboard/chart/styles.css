@@ -19,8 +19,8 @@ z-index: 100;}
     /* Changes the hover color of the row*/
     --ag-row-hover-color: rgb(216, 226, 255);
 }
-@media (min-width: 1200px) {
+/* @media (min-width: 1200px) {
   .modal-xl {
     --bs-modal-width: 1039px;
   }
-}
+} */

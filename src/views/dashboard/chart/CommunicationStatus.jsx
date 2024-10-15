@@ -8,78 +8,169 @@ import html2canvas from 'html2canvas';
 import './styles.css';
 import ExcelJS from 'exceljs';
 import UserData from './UserData';
+import axios from 'axios';
+
 
 const CommunicationStatus = () => {
   const chartRef=useRef(null);
-  const [chartData, setChartData] = useState([
-    { month: "January", iceCreamSales: 162000 },
-    { month: "March", iceCreamSales: 302000 },
-    { month: "May", iceCreamSales: 800000 },
-    { month: "July", iceCreamSales: 125000 },
-    { month: "September", iceCreamSales: 150000 },
-    { month: "November", iceCreamSales: 200000 },
-    { month: "December", iceCreamSales: 125000 }
+   const [chartData, setChartData] = useState([
+  //   { month: "January", iceCreamSales: 162000 },
+  //   { month: "March", iceCreamSales: 302000 },
+  //   { month: "May", iceCreamSales: 800000 },
+  //   { month: "July", iceCreamSales: 125000 },
+  //   { month: "September", iceCreamSales: 150000 },
+  //   { month: "November", iceCreamSales: 200000 },
+  //   { month: "December", iceCreamSales: 125000 }
   ]);
-  const [selectedMonth, setSelectedMonth] = useState('All');
+  const [selectedPrdCategory, setSelectedProductCategory] = useState('All');
   const [options, setOptions] = useState(null);  
   const [showModal,setShowModal]=useState(false);
   const [clickedData,setclickedData]=useState({});
+  const [clickedPrdCat,setclickedPrdCat]=useState();
   const [showChart,setshowChart]=useState(true);
   const [showTable,setshowTable]=useState(false);
-  const [tableData,settableData]=useState();
+  const [tableData,settableData]=useState([]);
+  const [userproducts,setuserproducts]=useState([]);
+  const [menProducts,setmenProducts]=useState();
+  const [womenProducts,setwomenProducts]=useState();
+  const [jewProducts,setjewProducts]=useState();
+  const [electProducts,setelectProducts]=useState();
+  const [menPrdCount,setmenPrdCount]=useState();
+  const [womenPrdCount,setwomenPrdCount]=useState();
+  const [jewPrdCount,setjewPrdCount]=useState();
+  const [electPrdCount,setelectPrdCount]=useState();
 
-  const handleChangeSelectedMonth = (e) => {
-    setSelectedMonth(e.target.value);
+  useEffect(()=>{
+    const getProducts = async () => {
+      try {
+        const response = await axios.get('https://fakestoreapi.com/products');
+        const products = response.data;
+        const p1=products.filter(p=>p.category===`men's clothing`);
+        const p2=products.filter(p=>p.category===`women's clothing`);
+        const p3=products.filter(p=>p.category==='jewelery');
+        const p4=products.filter(p=>p.category==='electronics');
+        setuserproducts(products);
+        setmenProducts(p1);
+        setwomenProducts(p2);
+        setjewProducts(p3);
+        setelectProducts(p4);
+        setmenPrdCount(p1.length);
+        setwomenPrdCount(p2.length);
+        setjewPrdCount(p3.length);
+        setelectPrdCount(p4.length);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    getProducts();
+  },[]);
+ 
+  useEffect(() => {
+    if (userproducts.length > 0) {
+      setOptions({
+        title: { text: 'Products Categories Data' },
+        data: [
+          {ProductCategory:`Men's Clothing`, ProductsCount: menPrdCount},
+          {ProductCategory:`Women's Clothing`, ProductsCount: womenPrdCount},
+          {ProductCategory:'Jewelery', ProductsCount: jewPrdCount},
+          {ProductCategory:'Electronic', ProductsCount: electPrdCount}
+        ],
+        width: 920,
+        height: 500,
+        series: [
+          {
+            type: "bar",
+            xKey: "ProductCategory",
+            yKey: "ProductsCount",
+            yName: 'ProductsCount',
+            listeners: {
+              nodeClick: handleBarClick,
+            },
+          },
+        ],
+      });
+      settableData(userproducts);
+    }
+  }, [userproducts, menPrdCount, womenPrdCount, jewPrdCount, electPrdCount]);
+  
+
+  const handleChangeSelectedPrdCategory = (e) => {
+    setSelectedProductCategory(e.target.value);
   };
 
   const handleBarClick = (params) => {
-    const dt = params.datum;
-    setclickedData(dt);
+    const pc = params.datum.ProductCategory;
+    if(pc==`Men's Clothing`){
+      setclickedData(menProducts);
+    }
+    else if(pc==`Women's Clothing`){
+      setclickedData(womenProducts);
+    }
+    else if(pc=='Jewelery'){
+      setclickedData(jewProducts);
+    }
+    else if(pc=='Electronic'){
+      setclickedData(electProducts);
+    }
+    setclickedPrdCat(pc);
     setShowModal(true);
+    console.log('modal data:',clickedData);
   };
   useEffect(() => {
     let newData;
 
-    if (selectedMonth === 'All') {
+    if (selectedPrdCategory === 'All') {
       newData = [
-        { month: "January", iceCreamSales: 162000 },
-        { month: "March", iceCreamSales: 302000 },
-        { month: "May", iceCreamSales: 800000 },
-        { month: "July", iceCreamSales: 125000 },
-        { month: "September", iceCreamSales: 150000 },
-        { month: "November", iceCreamSales: 200000 },
-        { month: "December", iceCreamSales: 125000 }
+        {ProductCategory:`Men's Clothing`,ProductsCount:menPrdCount},
+        {ProductCategory:`Women's Clothing`,ProductsCount:womenPrdCount},
+        {ProductCategory:'Jewelery',ProductsCount:jewPrdCount},
+        {ProductCategory:'Electronic',ProductsCount:electPrdCount}
       ];
-    } else {
-      newData = chartData.filter(data => data.month === selectedMonth);
+      settableData(userproducts);
+    } 
+    else if(selectedPrdCategory==='Men Clothing'){
+      newData=[{ProductCategory:`Men's Clothing`,ProductsCount:menPrdCount}];
+      settableData(menProducts);
+    }
+    else if(selectedPrdCategory=='Women Clothing'){
+      newData=[{ProductCategory:`Women's Clothing`,ProductsCount:womenPrdCount}];
+      settableData(womenProducts);
+    }
+    else if(selectedPrdCategory==='Jewelery'){
+      newData=[{ProductCategory:'Jewelery',ProductsCount:jewPrdCount}];
+      settableData(jewProducts);
+    }
+    else if(selectedPrdCategory==='Electronic'){
+      newData=[{ProductCategory:'Electronic',ProductsCount:electPrdCount}];
+      settableData(electProducts);
     }
 
     setOptions({
-      title: { text: 'Monthly Ice Cream Sales Data' },
+      title: { text: 'Products Categories Data' },
       data: newData,
       width: 920,
-      height: 550,
+      height: 500,
       series: [
         {
           type: "bar",
-          xKey: "month",
-          yKey: "iceCreamSales",
-          yName: 'IceCream Sales',
+          xKey: "ProductCategory",
+          yKey: "ProductsCount",
+          yName: 'ProductsCount',
           listeners: {
             nodeClick: handleBarClick,
             },
           }
       ]
     });
-    settableData(newData);
-  }, [selectedMonth]);
+  }, [selectedPrdCategory]);
 
   
-  const DataModal = ({ onClose, mdata, canvasref }) => {
+  const DataModal = ({ onClose, mdata, canvasref ,prodcat}) => {
     const dCSV = () => {
-      const csvContent = `Ice Cream Sales Chart Data for month:${mdata.month}\nMonth,Sales\n${mdata.month},${mdata.iceCreamSales}`;
+      const csvContent = `Products Data for category:  ${prodcat}\nId,Title,Price,Category\n`
+      + mdata.map(e => `${e.id},${e.title},${e.price},${e.category}`).join("\n");
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      saveAs(blob, `${mdata.month}_sales.csv`);
+      saveAs(blob, `${prodcat}_products_data.csv`);
     };
 
     const dPDF = () => {
@@ -102,7 +193,7 @@ const CommunicationStatus = () => {
         const pdfHeight = doc.internal.pageSize.getHeight();
     
         doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        doc.save("chart_data.pdf");
+        doc.save(`${prodcat}_products_data.pdf`);
       }).catch(err => {
         console.error("Error generating PDF:", err);
       });
@@ -112,9 +203,9 @@ const CommunicationStatus = () => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Ice Cream Sales Data');
     
-      worksheet.addRow([`Ice Cream Sales Data for Month: ${mdata.month}`]);
+      worksheet.addRow([`Products Data for category: ${prodcat}`]);
     
-      const header = ['Month', 'Sales'];
+      const header = ['Id', 'Title','Price','Category'];
       const headerRow = worksheet.addRow(header);
     
       headerRow.eachCell((cell) => {
@@ -125,9 +216,11 @@ const CommunicationStatus = () => {
           fgColor: { argb: 'FFFF00' },
         };
       });
-    
-      worksheet.addRow([mdata.month, mdata.iceCreamSales]);
-    
+      {
+        mdata.forEach((data)=>{
+          worksheet.addRow([data.id,data.title,data.price,data.category]);
+        });
+      }    
       worksheet.columns.forEach((column) => {
         let maxLength = 0;
         column.eachCell({ includeEmpty: true }, (cell) => {
@@ -146,19 +239,19 @@ const CommunicationStatus = () => {
     
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, `${mdata.month}_sales.xlsx`);
+      saveAs(blob, `${prodcat}_products_data.xlsx`);
     };
     return (
-      <Modal show={showModal} onHide={onClose} size="xl" centered className='mdl'>
+      <Modal show={showModal} onHide={onClose} size="xl" centered className='mdl col-xl-7' md='5' sm='8'>
         <Modal.Header closeButton>
           <Col md='10'>
             <Row>
-              <Col md='8' className='d-flex'>
+              <Col md='9' className='d-flex'>
                 <Modal.Title>
-                  <p>Ice Cream Sales Data for month: {mdata.month}</p>
+                  <p>Products Categories Data: {prodcat}</p>
                 </Modal.Title>
               </Col>
-              <Col md='2' className="d-flex justify-content-end">
+              <Col md='1' className="d-flex justify-content-end m-2">
                 <DropdownButton id="dropdown-basic-button" title="Export Options">
                   <Dropdown.Item onClick={dCSV}>CSV</Dropdown.Item>
                   <Dropdown.Item onClick={dPDF}>PDF</Dropdown.Item>
@@ -172,15 +265,23 @@ const CommunicationStatus = () => {
           <Table bordered striped hover size='lg'>
             <thead className='text-center'>
               <tr className="border">
-                <th>Month</th>
-                <th>Sales</th>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Category</th>
               </tr>
             </thead>
             <tbody className='text-center'>
-              <tr>
-                <td>{mdata.month}</td>
-                <td>{mdata.iceCreamSales}</td>
+              {
+                mdata.map(p=>
+                  <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.title}</td>
+                <td>{p.price}</td>
+                <td>{p.category}</td>
               </tr>
+                )
+              }
             </tbody>
           </Table>
         </Modal.Body>
@@ -192,8 +293,8 @@ const CommunicationStatus = () => {
   };
 
   const downloadCSV = () => {
-    const csvContent = `Ice Cream Sales Chart Data\nMonth,Sales\n`
-      + chartData.map(e => `${e.month},${e.iceCreamSales}`).join("\n");
+    const csvContent = `Products Data for category:  ${prodcat}\nId,Title,Price,Category\n`
+      + userproducts.map(e => `${e.id},${e.title},${e.price},${e.category}`).join("\n");
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, 'chart_data.csv');
@@ -248,22 +349,19 @@ const CommunicationStatus = () => {
     <div className="form-container  mx-auto p-3">
       <Form as={Row} md='12' className="align-items-center mb-3">
         <Form.Group as={Col} md={6} className="d-flex">
-        <Form.Label className="d-flex" >Select Month</Form.Label>
-        <Form.Control as="select" value={selectedMonth} onChange={handleChangeSelectedMonth}>
+        <Form.Label className="d-flex" >Select Product Category</Form.Label>
+        <Form.Control as="select" value={selectedPrdCategory} onChange={handleChangeSelectedPrdCategory}>
           <option value="All">All</option>
-          <option value="January">January</option>
-          <option value="March">March</option>
-          <option value="May">May</option>
-          <option value="July">July</option>
-          <option value="September">September</option>
-          <option value="November">November</option>
-          <option value="December">December</option>
+          <option value="Men Clothing">Men Clothing</option>
+          <option value="Women Clothing">Women Clothing</option>
+          <option value="Jewelery">Jewelery</option>
+          <option value="Electronic">Electronic</option>
         </Form.Control>
         </Form.Group>
         <Col md={2} className="d-flex justify-content-center ">
         
           { !showTable&&(
-            <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedMonth !== 'All'}>
+            <DropdownButton id="dropdown-basic-button" title="Export Options" disabled={selectedPrdCategory !== 'All'}>
               <Dropdown.Item onClick={downloadCSV}>CSV</Dropdown.Item>
               <Dropdown.Item onClick={downloadPDF}>PDF</Dropdown.Item>
               <Dropdown.Item onClick={downloadPNG}>PNG</Dropdown.Item>
@@ -276,18 +374,26 @@ const CommunicationStatus = () => {
         </Col>
       </Form>
     </div>
-    { showTable ?(
+    { showTable &&(
         <div>
           <UserData tdata={tableData} />
-        </div>
-        ):
-        <div ref={chartRef} className="ag-charts-wrapper" lg='9' md='10' sm='10' >
-          {options && <AgCharts options={options} />}
-        </div>
-    } 
+        </div>)
+    }
+
+        { chartData  && !showTable && options && (
+          <div ref={chartRef} className="ag-charts-wrapper col-xl-8">
+            <AgCharts options={options} />
+          </div>
+        )}
+            
+        {
+          !chartData && !showTable && !options && (
+            <div>Loading Chart...</div>
+          )
+        }
 
     {showModal && (
-      <DataModal onClose={() => setShowModal(false)} mdata={clickedData} canvasref={chartRef} />
+      <DataModal onClose={() => setShowModal(false)} mdata={clickedData} prodcat={clickedPrdCat} canvasref={chartRef} />
     )}
   </div>
   );

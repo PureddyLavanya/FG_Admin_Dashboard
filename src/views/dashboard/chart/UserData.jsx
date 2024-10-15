@@ -11,35 +11,43 @@ const UserData=({tdata})=>{
   const [rowData, setRowData] = useState([]);
   const defaultColDef=useMemo(()=>{
     return {
-      flex:6,
+      flex:3,
       filter:true,
-      floatingFilter:true,
+      // floatingFilter:true,
       filterParams:{
         debounceMs:1000,
         buttons: ['apply','reset']
-      },
-      editable:true
+      }
     };
   });  
-  const [colDefs, setColDefs] = useState([
-    { field: "month",
-      // headerName,valueFormatter,valueGetter,cellRenderer,cellClassRules
-      editable:true,
-      cellEditor:"agSelectCellEditor",
-      cellEditorParams:{values:["January","February","March","April","May","June","July","August","September","October","November","December"]},
-      checkboxSelection:true
-    },
-    { field: "iceCreamSales"
-    }
-  ]);
+  const [colDefs, setColDefs] = useState([]);
+    
   useEffect(()=>{
     setRowData(tdata);
+    setColDefs([
+      { field: "id",
+        // headerName,valueFormatter,valueGetter,cellRenderer,cellClassRules
+        // editable:true,
+        // cellEditor:"agSelectCellEditor",
+        // cellEditorParams:{values:[]]},
+        // checkboxSelection:true
+      },
+      { field: "title",
+      },
+      {
+        field:"price"
+      },
+      {
+        field:"category"
+      }
+    ]);
+    console.log(tdata);
   },[tdata]);
   const exportExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Ice Cream Sales Data');
+    const worksheet = workbook.addWorksheet('Products Data');
 
-    const header = ['Month', 'Sales'];
+    const header = ['Id', 'Title','Price','Category'];
     const headerRow = worksheet.addRow(header);
   
     headerRow.eachCell((cell) => {
@@ -58,7 +66,7 @@ const UserData=({tdata})=>{
     });
   
     tdata.forEach((data) => {
-      worksheet.addRow([data.month, data.iceCreamSales]);
+      worksheet.addRow([data.id, data.title,data.price,data.category]);
     });
     worksheet.columns.forEach((column) => {
       let maxLength = 0;
@@ -73,7 +81,7 @@ const UserData=({tdata})=>{
   
     worksheet.autoFilter = {
       from: 'A1',
-      to: 'B1',
+      to: 'C20',
     };
   
     const buffer = await workbook.xlsx.writeBuffer();
@@ -96,6 +104,7 @@ const UserData=({tdata})=>{
         //rowClassRules={}
         />
       </div>
+
     </div>
   );
 };
