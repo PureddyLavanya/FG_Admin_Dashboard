@@ -71,6 +71,11 @@ export const routes = [
       },
       {
         exact: 'true',
+        path: '/dashboard/sampledashboard',
+        element: lazy(()=> import('./views/dashboard/chart/SampleDashboard'))
+      },
+      {
+        exact: 'true',
         path: '/basic/breadcrumb-pagination',
         element: lazy(() => import('./views/ui-elements/BasicBreadcrumbPagination'))
       },

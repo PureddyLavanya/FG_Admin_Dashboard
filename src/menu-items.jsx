@@ -26,6 +26,12 @@ const menuItems = {
               url: '/dashboard/communicationstatus'
             },
             {
+              id:'dashboard',
+              title:'Sample Dashboard',
+              type:'item',
+              url:'/dashboard/sampledashboard'
+            },
+            {
               id: 'dataavailability',
               title: 'Data Availability',
               type: 'item',
