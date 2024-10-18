@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { AgCharts } from "ag-charts-react";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 const OfficeData=()=>{
   const [options, setOptions] = useState({
@@ -118,14 +121,40 @@ const OfficeData=()=>{
       },
     ],
   });
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dt = new Date();
+  const [userdate, setuserdate] = useState(formatDate(dt));
+  const [currentMonth, setcurrentMonth] = useState('');
+  const [prevMonth, setprevMonth] = useState('');
 
+  function formatDate(date) {
+    const day = String(date.getDate()).slice(0,2);
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  }
+  const savedate = (date) => {
+    const uinput = date;
+    const cdt = uinput.getDate();
+    const cmonth = uinput.getMonth();
+    const cyear = uinput.getFullYear();
+    const pmonth = cmonth === 0 ? 11 : cmonth - 1;
+    const pyear = cmonth === 0 ? cyear - 1 : cyear;
+    const cmonthnm = months[cmonth];
+    const pmonthnm = months[pmonth];
+    setcurrentMonth(cmonthnm);
+    setprevMonth(pmonthnm);
+    setuserdate(date);
+    console.log(`Current Month:${cmonthnm}-${cyear}`);
+    console.log(`Previous Month:${pmonthnm}-${pyear}`);
+  };
   return (
     <div className="col-xl-12 h-100 m-1 mx-auto ml-4 mx-auto">
-      <div className="bg-dark text-white p-3 d-flex justify-content-start">
+      <div className="bg-dark text-white p-3 d-flex flex-wrap justify-content-start">
         <div className="form-check form-check-inline">
           <label className="form-check-label" htmlFor="inlineselectbox">Zones:</label>
-          <select id='inlineselectbox' className="ml-2">
-            <option selected value='All'>All</option>
+          <select id='inlineselectbox' className="ml-1" defaultValue="All">
+            <option  value='All'>All</option>
             <option value='option2'>option2</option>
             <option value='option3'>option3</option>
           </select>
@@ -136,10 +165,10 @@ const OfficeData=()=>{
         </div>
         <div className="form-date form-date-inline ml-2">
           <label className="form-date-label" htmlFor="inlineDate">Date</label>
-          <input className="form-date-input ml-1" type="date" name="inlineDate" id="inlineDate"  />
+          <DatePicker selected={userdate} onChange={savedate} dateFormat="MMM-yyyy" minDate={new Date("2020-01-01")} maxDate={new Date()} />
         </div>
       </div> <br/>
-      <div className='col-xl-10 mx-auto' >
+      <div className='col-xl-12 h-100 mx-auto'>
         <AgCharts options={options}/>
       </div>
     </div>

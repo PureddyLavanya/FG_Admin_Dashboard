@@ -13,15 +13,7 @@ import axios from 'axios';
 
 const CommunicationStatus = () => {
   const chartRef=useRef(null);
-   const [chartData, setChartData] = useState([
-  //   { month: "January", iceCreamSales: 162000 },
-  //   { month: "March", iceCreamSales: 302000 },
-  //   { month: "May", iceCreamSales: 800000 },
-  //   { month: "July", iceCreamSales: 125000 },
-  //   { month: "September", iceCreamSales: 150000 },
-  //   { month: "November", iceCreamSales: 200000 },
-  //   { month: "December", iceCreamSales: 125000 }
-  ]);
+   const [chartData, setChartData] = useState([]);
   const [selectedPrdCategory, setSelectedProductCategory] = useState('All');
   const [options, setOptions] = useState(null);  
   const [showModal,setShowModal]=useState(false);
@@ -242,7 +234,7 @@ const CommunicationStatus = () => {
       saveAs(blob, `${prodcat}_products_data.xlsx`);
     };
     return (
-      <Modal show={showModal} onHide={onClose} size="xl" centered className='mdl col-xl-7' md='5' sm='8'>
+      <Modal show={showModal} onHide={onClose} size="xl" centered scrollable className='mdl modal-fullscreen-sm-down'>
         <Modal.Header closeButton>
           <Col md='10'>
             <Row>
@@ -262,7 +254,7 @@ const CommunicationStatus = () => {
           </Col>
         </Modal.Header>
         <Modal.Body>
-          <Table bordered striped hover size='lg'>
+          <Table bordered striped hover size='lg' className="table table-responsive">
             <thead className='text-center'>
               <tr className="border">
                 <th>Id</th>
@@ -343,13 +335,12 @@ const CommunicationStatus = () => {
     });
   };
   
-
   return (
     <div className="mx-auto">
     <div className="form-container  mx-auto p-3">
       <Form as={Row} md='12' className="align-items-center mb-3">
         <Form.Group as={Col} md={6} className="d-flex">
-        <Form.Label className="d-flex" >Select Product Category</Form.Label>
+        <Form.Label className="" >Select Product Category</Form.Label>
         <Form.Control as="select" value={selectedPrdCategory} onChange={handleChangeSelectedPrdCategory}>
           <option value="All">All</option>
           <option value="Men Clothing">Men Clothing</option>

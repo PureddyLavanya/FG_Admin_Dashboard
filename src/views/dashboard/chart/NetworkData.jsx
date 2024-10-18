@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { AgCharts } from "ag-charts-react";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 const NetworkData=()=>{
   const [options, setOptions] = useState({
@@ -137,10 +140,36 @@ const NetworkData=()=>{
       },
     ],
   });
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const dt = new Date();
+  const [userdate, setuserdate] = useState(formatDate(dt));
+  const [currentMonth, setcurrentMonth] = useState('');
+  const [prevMonth, setprevMonth] = useState('');
 
+  function formatDate(date) {
+    const day = String(date.getDate()).slice(0,2);
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  }
+  const savedate = (date) => {
+    const uinput = date;
+    const cdt = uinput.getDate();
+    const cmonth = uinput.getMonth();
+    const cyear = uinput.getFullYear();
+    const pmonth = cmonth === 0 ? 11 : cmonth - 1;
+    const pyear = cmonth === 0 ? cyear - 1 : cyear;
+    const cmonthnm = months[cmonth];
+    const pmonthnm = months[pmonth];
+    setcurrentMonth(cmonthnm);
+    setprevMonth(pmonthnm);
+    setuserdate(date);
+    console.log(`Current Month:${cmonthnm}-${cyear}`);
+    console.log(`Previous Month:${pmonthnm}-${pyear}`);
+  };
   return(
     <div className="col-xl-12 h-100 m-1 mx-auto">
-      <div className="p-3 bg-dark text-white d-flex justify-content-start">
+      <div className="p-3 bg-dark text-white d-flex flex-wrap justify-content-start">
         <div className="form-check form-check-inline">
           <label className="form-check-label" htmlFor="inlineselectbox">Substation:</label>
           <select id='inlineselectbox'>
@@ -167,10 +196,10 @@ const NetworkData=()=>{
         </div>
         <div className="form-date form-date-inline">
           <label className="form-date-label" htmlFor="inlineDate">Date</label>
-          <input className="form-date-input" type="date" name="inlineDate" id="inlineDate" />
+          <DatePicker selected={userdate} onChange={savedate} dateFormat="MMM-yyyy" minDate={new Date("2020-01-01")} maxDate={new Date()} />
         </div>
       </div> <br/>
-      <div className="col-xl-10 mx-auto">
+      <div className="col-xl-12 h-100 mx-auto">
         <AgCharts options={options} />
       </div>
     </div>

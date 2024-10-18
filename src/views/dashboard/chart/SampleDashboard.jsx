@@ -4,10 +4,9 @@ import NetworkData from './NetworkData';
 
 const SampleDashboard = () => {
   const [showOffice, setshowOffice] = useState(true);
-
   return (
     <div>
-      <div className='col-xl-12 bg-dark text-white p-3 ml-4 d-flex justify-content-center'>
+      <div className='col-xl-12 bg-dark text-white p-3 ml-4 d-flex justify-content-start'>
         <div className="form-check form-check-inline">
           <input
             className="form-check-input"
